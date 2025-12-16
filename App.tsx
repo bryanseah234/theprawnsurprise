@@ -3,14 +3,14 @@ import { Tab } from './types';
 import { DiceRoller } from './components/Dice/DiceRoller';
 import { ChaosWheel } from './components/Spinner/ChaosWheel';
 import { Magic8Ball } from './components/MagicBall/Magic8Ball';
-import { RetroButton, cn } from './components/ui/RetroButton';
+import { cn } from './components/ui/RetroButton';
 import { Dices, Disc, Sparkles } from 'lucide-react';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>(Tab.DICE);
 
   return (
-    <div className="min-h-screen bg-ocean flex flex-col items-center">
+    <div className="min-h-screen bg-white flex flex-col items-center">
       
       {/* Header */}
       <header className="w-full bg-coral border-b-4 border-black p-6 shadow-retro z-10">
@@ -50,7 +50,7 @@ const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 w-full max-w-4xl mx-auto p-4 mb-12">
-        <div className="bg-white/5 border-2 border-black p-4 sm:p-8 shadow-retro min-h-[400px] flex items-center justify-center relative backdrop-blur-sm">
+        <div className="bg-ocean text-white border-2 border-black p-4 sm:p-8 shadow-retro min-h-[400px] flex items-center justify-center relative backdrop-blur-sm">
           {/* Decorative Corner Pixels */}
           <div className="absolute top-0 left-0 w-4 h-4 bg-zest border-r-2 border-b-2 border-black"></div>
           <div className="absolute top-0 right-0 w-4 h-4 bg-zest border-l-2 border-b-2 border-black"></div>
@@ -64,8 +64,8 @@ const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="w-full text-center py-4 text-white/50 text-xs font-retro">
-        <p>BUILT FOR CHAOS.</p>
+      <footer className="w-full text-center py-4 text-black/50 text-xs font-retro">
+        <p>BUILT WITH 🦐 POWER</p>
       </footer>
     </div>
   );

@@ -1,20 +1,33 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Prawn Surprise ?!
 
-# Run and deploy your AI Studio app
+A retro-themed, chaotic decision-making web application featuring pixel art aesthetics and neo-brutalist design.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/drive/1CAgjGJ3HQmRd4z7JB3zQ6pD3fuv8AK0j
+- **Polyhedral Dice Roller**: 3D CSS-animated dice (d4, d6, d8, d10) with physics-based rolling effects.
+- **Chaos Spinner Wheel**: A dynamic, customizable wheel for random selection with up to 10 options.
+- **Magic 8-Ball**: A classic fortune-telling tool with a shaky, retro interface.
 
-## Run Locally
+## Tech Stack
 
-**Prerequisites:**  Node.js
+- **Framework**: React + TypeScript (Vite)
+- **Styling**: Tailwind CSS + Custom CSS 3D Transforms
+- **Animation**: Framer Motion
+- **Icons**: Lucide React
 
+## Getting Started
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install
+   ```
+
+2. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Build for production:
+   ```bash
+   npm run build
+   ```

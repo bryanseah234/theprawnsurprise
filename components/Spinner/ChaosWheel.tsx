@@ -114,6 +114,7 @@ export const ChaosWheel: React.FC = () => {
                {/* Slice Labels (Tricky to position perfectly in generic conic, simple overlay here) */}
                {items.length > 0 && items.map((item, i) => {
                    const angle = (360 / items.length) * i + (360 / items.length) / 2;
+                   const isLight = item.color === '#FFFFFF' || item.color === '#F4D03F' || item.color === '#FF6F61';
                    return (
                        <div 
                          key={item.id}
@@ -123,8 +124,8 @@ export const ChaosWheel: React.FC = () => {
                            <span 
                              className="block transform -rotate-90 origin-center truncate w-20 text-center"
                              style={{ 
-                                 color: item.color === '#FFFFFF' || item.color === '#F4D03F' ? 'black' : 'white',
-                                 textShadow: '1px 1px 0px rgba(0,0,0,0.5)'
+                                 color: isLight ? 'black' : 'white',
+                                 textShadow: isLight ? 'none' : '1px 1px 0px rgba(0,0,0,0.5)'
                             }}
                             >
                                {item.label}

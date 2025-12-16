@@ -58,12 +58,12 @@ export const Magic8Ball: React.FC = () => {
                   transition={{ duration: 1, type: 'spring' }}
                   className="w-full h-full flex items-center justify-center"
                 >
-                    {/* Blue Triangle */}
+                    {/* Blue Triangle - Pointing Down */}
                     <div className="relative w-32 h-32 flex items-center justify-center">
                         <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-blue-700 fill-current drop-shadow-lg">
-                            <polygon points="50,5 95,90 5,90" />
+                            <polygon points="5,5 95,5 50,90" />
                         </svg>
-                         <p className="relative z-10 text-center text-blue-100 font-sans text-xs sm:text-sm font-bold w-24 leading-tight uppercase tracking-wider drop-shadow-md">
+                         <p className="relative z-10 text-center text-blue-100 font-sans text-xs sm:text-sm font-bold w-24 leading-tight uppercase tracking-wider drop-shadow-md pt-2">
                             {answer}
                         </p>
                     </div>
