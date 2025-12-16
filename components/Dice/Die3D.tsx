@@ -1,10 +1,10 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Text, Float, Environment, Center } from '@react-three/drei';
+import { Text, Float } from '@react-three/drei';
 import * as THREE from 'three';
 import { DieType } from '../../types';
 
-// Fix for missing types in this environment by explicitly defining them as any
+// Use string tags for intrinsic elements to avoid TypeScript environment issues
 const Group = 'group' as any;
 const Mesh = 'mesh' as any;
 const MeshStandardMaterial = 'meshStandardMaterial' as any;
@@ -61,28 +61,31 @@ const getDieConfig = (type: DieType) => {
   switch (type) {
     case DieType.D4: {
         // Tetrahedron (Radius 1.5)
-        // Distance from center to face is radius / 3 = 0.5
+        // Distance to face center = radius / 3 = 0.5
+        // Note: Standard Tetrahedron vertices are (1,1,1), (1,-1,-1), (-1,1,-1), (-1,-1,1).
+        // The Faces are OPPOSITE these vertices.
         const d4Geo = new THREE.TetrahedronGeometry(1.5);
         d4Geo.computeVertexNormals();
         return {
           geometry: d4Geo,
-          textOffset: 0.55, // Slightly above 0.5
-          fontSize: 0.4, // Smaller font for small faces
+          textOffset: 0.6, // Just above the surface (0.5)
+          fontSize: 0.35,
           faces: [
-            { value: 1, normal: new THREE.Vector3(1, 1, 1).normalize() },
-            { value: 2, normal: new THREE.Vector3(-1, -1, 1).normalize() },
-            { value: 3, normal: new THREE.Vector3(-1, 1, -1).normalize() },
-            { value: 4, normal: new THREE.Vector3(1, -1, -1).normalize() }
+            // Inverted vectors to point to faces, not vertices
+            { value: 1, normal: new THREE.Vector3(-1, -1, -1).normalize() },
+            { value: 2, normal: new THREE.Vector3(1, 1, -1).normalize() },
+            { value: 3, normal: new THREE.Vector3(1, -1, 1).normalize() },
+            { value: 4, normal: new THREE.Vector3(-1, 1, 1).normalize() }
           ]
         };
     }
 
     case DieType.D6: {
         // Cube (Size 2)
-        // Distance from center to face is 1.0
+        // Distance to face center = 1.0
         return {
           geometry: new THREE.BoxGeometry(2, 2, 2),
-          textOffset: 1.02, // Just barely above surface
+          textOffset: 1.05, 
           fontSize: 0.8,
           faces: [
             { value: 1, normal: new THREE.Vector3(1, 0, 0) },
@@ -97,11 +100,11 @@ const getDieConfig = (type: DieType) => {
 
     case DieType.D8: {
         // Octahedron (Radius 1.5)
-        // Distance to face center approx 0.866
+        // Distance to face center ~ 0.866
         return {
           geometry: new THREE.OctahedronGeometry(1.5),
-          textOffset: 0.9,
-          fontSize: 0.5,
+          textOffset: 0.88,
+          fontSize: 0.45,
           faces: [
             { value: 1, normal: new THREE.Vector3(1, 1, 1).normalize() },
             { value: 2, normal: new THREE.Vector3(-1, 1, 1).normalize() },
@@ -117,15 +120,17 @@ const getDieConfig = (type: DieType) => {
 
     case DieType.D10: {
         // Custom D10
-        // Approx distance to face logic calculated manually
+        // Calculated distance to face is approx 0.58
         const d10Geo = createD10Geometry();
         const d10Faces = [];
         for(let i=0; i<5; i++) {
              const angle = (i / 5) * Math.PI * 2 + (Math.PI/5); 
+             // Top faces
              d10Faces.push({
                  value: i * 2 + 1,
                  normal: new THREE.Vector3(Math.sin(angle), 0.5, Math.cos(angle)).normalize()
              });
+             // Bottom faces
              d10Faces.push({
                  value: i * 2 + 2,
                  normal: new THREE.Vector3(Math.sin(angle), -0.5, Math.cos(angle)).normalize()
@@ -134,8 +139,8 @@ const getDieConfig = (type: DieType) => {
 
         return {
             geometry: d10Geo,
-            textOffset: 0.85, // Tuned for flush look
-            fontSize: 0.5,
+            textOffset: 0.62,
+            fontSize: 0.4,
             faces: d10Faces
         };
     }
@@ -160,6 +165,7 @@ const DieMesh = ({ type, result, isRolling }: { type: DieType, result: number | 
     let face = faces.find(f => f.value === result);
     if (!face) face = faces[0];
 
+    // Align the face normal to +Z (camera)
     const targetVec = new THREE.Vector3(0, 0, 1);
     const quaternion = new THREE.Quaternion();
     quaternion.setFromUnitVectors(face.normal, targetVec);
@@ -175,6 +181,7 @@ const DieMesh = ({ type, result, isRolling }: { type: DieType, result: number | 
       meshRef.current.rotation.y += rotationSpeed.current.y;
       meshRef.current.rotation.z += rotationSpeed.current.z;
     } else if (result !== null && targetQuaternion) {
+      // Smoothly slerp to target
       meshRef.current.quaternion.slerp(targetQuaternion, 0.1);
     }
   });
@@ -182,9 +189,10 @@ const DieMesh = ({ type, result, isRolling }: { type: DieType, result: number | 
   return (
     <Group>
         <Mesh ref={meshRef} geometry={geometry}>
+            {/* Coral material */}
             <MeshStandardMaterial color="#FF6F61" roughness={0.4} metalness={0.1} flatShading />
             
-            {/* Render Numbers on Faces */}
+            {/* Render Numbers on Faces - Black for contrast */}
             {faces.map((face, i) => (
                 <FaceNumber 
                   key={i} 
@@ -195,7 +203,7 @@ const DieMesh = ({ type, result, isRolling }: { type: DieType, result: number | 
                 />
             ))}
             
-            {/* Edges for retro look (fixes D6 diagonal lines) */}
+            {/* Wireframe/Edges */}
             <LineSegments>
                 <EdgesGeometry args={[geometry, 15]} />
                 <LineBasicMaterial color="black" linewidth={2} />
@@ -209,11 +217,13 @@ const FaceNumber = ({ position, normal, value, fontSize }: { position: THREE.Vec
     return (
         <Group position={position} quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal)}>
              <Text
-                color="white"
+                color="black"
                 fontSize={fontSize}
                 font="https://fonts.gstatic.com/s/pressstart2p/v14/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff"
                 anchorX="center"
                 anchorY="middle"
+                renderOrder={1} // Ensure text renders on top of the face
+                depthTest={false} // CRITICAL: Prevents text from being hidden by the die face
             >
                 {value}
             </Text>

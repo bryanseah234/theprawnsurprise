@@ -1,13 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
-  <!-- Prawn Body Base -->
-  <path fill="#FF6F61" d="M12 8h8v2h2v4h-2v2h-2v2h-2v2h2v2h2v2h-4v-2h-2v-4h2v-2h2v-2h-2v-2h-4v-2h2v-2z" />
+  <!-- Background (Optional: can remove this rect for transparency) -->
+  <rect width="32" height="32" fill="none" />
   
-  <!-- Outline/Details -->
-  <path fill="#000000" d="M12 8h-2v2h-2v2h2v-2h2v-2zm8 0h2v2h2v4h-2v2h-2v2h-2v2h2v2h-2v2h-2v-2h2v-2h2v-2h2v-4h-2v-2h-2v-2zm-6 4h2v2h-2v-2zm4 0h2v2h-2v-2z" />
+  <!-- Shadow/Border Black -->
+  <path fill="#000000" d="
+    M5 4h8v2h-2v2h-2v2h2v4h-2v4h2v4h-4v-4h2v-2h-2v-4h2v-2h2v-2h-4v-2h-2v-2z
+    M11 24h4v4h-4z
+    M19 4h4v16h-4z
+    M19 24h4v4h-4z
+  " transform="translate(1, 1)" opacity="0.3"/>
 
-  <!-- Antennae -->
-  <path fill="#000000" d="M22 8h2v-2h2v-2h-2v2h-2v2zm-2 2h2v-2h2v-2h-2v2h-2v2z" opacity="0.6"/>
-  
-  <!-- Eye -->
-  <rect x="18" y="10" width="2" height="2" fill="black" />
+  <!-- Pixelated ? -->
+  <path fill="#F4D03F" d="
+    M4 4h8v2h-2v2h-2v2h2v4h-2v4h2v4h-4v-4h2v-2h-2v-4h2v-2h2v-2h-4v-2h-2v-2z
+    M10 24h4v4h-4z
+  " />
+
+  <!-- Pixelated ! -->
+  <path fill="#F4D03F" d="
+    M20 4h4v16h-4z
+    M20 24h4v4h-4z
+  " />
 </svg>
