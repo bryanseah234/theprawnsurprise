@@ -4,22 +4,16 @@ import { Text, Float, Environment, Center } from '@react-three/drei';
 import * as THREE from 'three';
 import { DieType } from '../../types';
 
-// Fix for missing types in this environment
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      group: any;
-      mesh: any;
-      meshStandardMaterial: any;
-      lineSegments: any;
-      wireframeGeometry: any;
-      lineBasicMaterial: any;
-      ambientLight: any;
-      pointLight: any;
-      spotLight: any;
-    }
-  }
-}
+// Fix for missing types in this environment by explicitly defining them as any
+const Group = 'group' as any;
+const Mesh = 'mesh' as any;
+const MeshStandardMaterial = 'meshStandardMaterial' as any;
+const LineSegments = 'lineSegments' as any;
+const EdgesGeometry = 'edgesGeometry' as any;
+const LineBasicMaterial = 'lineBasicMaterial' as any;
+const AmbientLight = 'ambientLight' as any;
+const PointLight = 'pointLight' as any;
+const SpotLight = 'spotLight' as any;
 
 // --- GEOMETRY HELPERS ---
 
@@ -62,24 +56,18 @@ const createD10Geometry = () => {
 };
 
 // --- DATA: FACE NORMALS & VALUES ---
-// We define where each number is on the standard geometries so we can rotate them to face the camera.
-// Normals are approximate "Up" vectors for the faces.
 
 const getDieConfig = (type: DieType) => {
-  const t = (1 + Math.sqrt(5)) / 2; // Golden ratio for Icosahedron if we used it, but we are using manual configs
-
   switch (type) {
-    case DieType.D4:
-        // Tetrahedron (Standard)
-        // Faces are at tetrahedral angles.
-        // We will construct vectors based on standard Tetrahedron geometry.
+    case DieType.D4: {
+        // Tetrahedron (Radius 1.5)
+        // Distance from center to face is radius / 3 = 0.5
         const d4Geo = new THREE.TetrahedronGeometry(1.5);
         d4Geo.computeVertexNormals();
-        // Extract face normals from geometry (approximate for the 4 faces)
-        // Face 0: (1, 1, 1), Face 1: (-1, -1, 1), etc... 
-        // We'll hardcode vectors that roughly match the visual center of faces
         return {
           geometry: d4Geo,
+          textOffset: 0.55, // Slightly above 0.5
+          fontSize: 0.4, // Smaller font for small faces
           faces: [
             { value: 1, normal: new THREE.Vector3(1, 1, 1).normalize() },
             { value: 2, normal: new THREE.Vector3(-1, -1, 1).normalize() },
@@ -87,11 +75,15 @@ const getDieConfig = (type: DieType) => {
             { value: 4, normal: new THREE.Vector3(1, -1, -1).normalize() }
           ]
         };
+    }
 
-    case DieType.D6:
-        // Cube
+    case DieType.D6: {
+        // Cube (Size 2)
+        // Distance from center to face is 1.0
         return {
           geometry: new THREE.BoxGeometry(2, 2, 2),
+          textOffset: 1.02, // Just barely above surface
+          fontSize: 0.8,
           faces: [
             { value: 1, normal: new THREE.Vector3(1, 0, 0) },
             { value: 2, normal: new THREE.Vector3(-1, 0, 0) },
@@ -101,39 +93,39 @@ const getDieConfig = (type: DieType) => {
             { value: 6, normal: new THREE.Vector3(0, 0, -1) }
           ]
         };
+    }
 
-    case DieType.D8:
-        // Octahedron
+    case DieType.D8: {
+        // Octahedron (Radius 1.5)
+        // Distance to face center approx 0.866
         return {
           geometry: new THREE.OctahedronGeometry(1.5),
+          textOffset: 0.9,
+          fontSize: 0.5,
           faces: [
-             // Top pyramid 4
             { value: 1, normal: new THREE.Vector3(1, 1, 1).normalize() },
             { value: 2, normal: new THREE.Vector3(-1, 1, 1).normalize() },
             { value: 3, normal: new THREE.Vector3(1, 1, -1).normalize() },
             { value: 4, normal: new THREE.Vector3(-1, 1, -1).normalize() },
-             // Bottom pyramid 4
             { value: 5, normal: new THREE.Vector3(1, -1, 1).normalize() },
             { value: 6, normal: new THREE.Vector3(-1, -1, 1).normalize() },
             { value: 7, normal: new THREE.Vector3(1, -1, -1).normalize() },
             { value: 8, normal: new THREE.Vector3(-1, -1, -1).normalize() },
           ]
         };
+    }
 
-    case DieType.D10:
-        // Custom Pentagonal Dipyramid
+    case DieType.D10: {
+        // Custom D10
+        // Approx distance to face logic calculated manually
         const d10Geo = createD10Geometry();
-        // Calculate face normals roughly. 
-        // 5 top faces, 5 bottom faces.
         const d10Faces = [];
         for(let i=0; i<5; i++) {
-             const angle = (i / 5) * Math.PI * 2 + (Math.PI/5); // Offset to center of face
-             // Top faces (1, 3, 5, 7, 9)
+             const angle = (i / 5) * Math.PI * 2 + (Math.PI/5); 
              d10Faces.push({
                  value: i * 2 + 1,
                  normal: new THREE.Vector3(Math.sin(angle), 0.5, Math.cos(angle)).normalize()
              });
-             // Bottom faces (2, 4, 6, 8, 10)
              d10Faces.push({
                  value: i * 2 + 2,
                  normal: new THREE.Vector3(Math.sin(angle), -0.5, Math.cos(angle)).normalize()
@@ -142,8 +134,11 @@ const getDieConfig = (type: DieType) => {
 
         return {
             geometry: d10Geo,
+            textOffset: 0.85, // Tuned for flush look
+            fontSize: 0.5,
             faces: d10Faces
         };
+    }
   }
 }
 
@@ -151,31 +146,22 @@ const getDieConfig = (type: DieType) => {
 
 const DieMesh = ({ type, result, isRolling }: { type: DieType, result: number | null, isRolling: boolean }) => {
   const meshRef = useRef<THREE.Mesh>(null);
-  const { geometry, faces } = useMemo(() => getDieConfig(type), [type]);
+  const { geometry, faces, textOffset, fontSize } = useMemo(() => getDieConfig(type), [type]);
   
-  // Random rotation speed vector
   const rotationSpeed = useRef(new THREE.Vector3(
      Math.random() * 0.2 + 0.1, 
      Math.random() * 0.2 + 0.1, 
      Math.random() * 0.2 + 0.1
   ));
 
-  // Determine target rotation when result is present
   const targetQuaternion = useMemo(() => {
     if (result === null || !meshRef.current) return null;
     
-    // Find the face definition for the result
-    // Note: D10 logic above generates odds then evens, we need to search properly
     let face = faces.find(f => f.value === result);
-    // Fallback if mismatch
     if (!face) face = faces[0];
 
-    // We want this face normal to point towards Camera Z (0, 0, 1)
-    // or slightly tilted for better viewing angle, let's say (0, 0.2, 1) normalized
     const targetVec = new THREE.Vector3(0, 0, 1);
-    
     const quaternion = new THREE.Quaternion();
-    // setFromUnitVectors calculates rotation from A to B
     quaternion.setFromUnitVectors(face.normal, targetVec);
     return quaternion;
 
@@ -185,53 +171,55 @@ const DieMesh = ({ type, result, isRolling }: { type: DieType, result: number | 
     if (!meshRef.current) return;
 
     if (isRolling) {
-      // Wild Spin
       meshRef.current.rotation.x += rotationSpeed.current.x;
       meshRef.current.rotation.y += rotationSpeed.current.y;
       meshRef.current.rotation.z += rotationSpeed.current.z;
     } else if (result !== null && targetQuaternion) {
-      // Deterministic Landing: Smoothly interpolate to the target quaternion
       meshRef.current.quaternion.slerp(targetQuaternion, 0.1);
     }
   });
 
   return (
-    <group>
-        <mesh ref={meshRef} geometry={geometry}>
-            <meshStandardMaterial color="#FF6F61" roughness={0.4} metalness={0.1} flatShading />
+    <Group>
+        <Mesh ref={meshRef} geometry={geometry}>
+            <MeshStandardMaterial color="#FF6F61" roughness={0.4} metalness={0.1} flatShading />
             
             {/* Render Numbers on Faces */}
             {faces.map((face, i) => (
-                <FaceNumber key={i} position={face.normal.clone().multiplyScalar(type === DieType.D4 ? 0.9 : 1.1)} normal={face.normal} value={face.value} />
+                <FaceNumber 
+                  key={i} 
+                  position={face.normal.clone().multiplyScalar(textOffset)} 
+                  normal={face.normal} 
+                  value={face.value} 
+                  fontSize={fontSize}
+                />
             ))}
             
-            {/* Wireframe for retro look */}
-            <lineSegments>
-                <wireframeGeometry args={[geometry]} />
-                <lineBasicMaterial color="black" linewidth={2} />
-            </lineSegments>
-        </mesh>
-    </group>
+            {/* Edges for retro look (fixes D6 diagonal lines) */}
+            <LineSegments>
+                <EdgesGeometry args={[geometry, 15]} />
+                <LineBasicMaterial color="black" linewidth={2} />
+            </LineSegments>
+        </Mesh>
+    </Group>
   );
 };
 
-// Helper to place text on the die surface
-const FaceNumber = ({ position, normal, value }: { position: THREE.Vector3, normal: THREE.Vector3, value: number }) => {
+const FaceNumber = ({ position, normal, value, fontSize }: { position: THREE.Vector3, normal: THREE.Vector3, value: number, fontSize: number }) => {
     return (
-        <group position={position} quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal)}>
+        <Group position={position} quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal)}>
              <Text
                 color="white"
-                fontSize={0.6}
-                font="https://fonts.gstatic.com/s/pressstart2p/v14/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff" // Google Font URL direct
+                fontSize={fontSize}
+                font="https://fonts.gstatic.com/s/pressstart2p/v14/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff"
                 anchorX="center"
                 anchorY="middle"
             >
                 {value}
             </Text>
-        </group>
+        </Group>
     )
 }
-
 
 // --- MAIN EXPORT ---
 
@@ -245,12 +233,10 @@ export const Die3D: React.FC<Die3DProps> = ({ type, value, isRolling }) => {
   return (
     <div className="w-full h-full">
       <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-        {/* Lighting */}
-        <ambientLight intensity={1.5} />
-        <pointLight position={[10, 10, 10]} intensity={2} />
-        <spotLight position={[-10, -10, 10]} angle={0.3} />
+        <AmbientLight intensity={1.5} />
+        <PointLight position={[10, 10, 10]} intensity={2} />
+        <SpotLight position={[-10, -10, 10]} angle={0.3} />
 
-        {/* Floating container for idle anim */}
         <Float speed={isRolling ? 0 : 2} rotationIntensity={isRolling ? 0 : 0.5} floatIntensity={isRolling ? 0 : 0.5}>
            <DieMesh type={type} result={value} isRolling={isRolling} />
         </Float>
