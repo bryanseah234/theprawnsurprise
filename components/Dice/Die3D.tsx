@@ -120,7 +120,7 @@ const getDieConfig = (type: DieType) => {
 
     case DieType.D10: {
         // Custom D10
-        // Calculated distance to face is approx 0.58
+        // Calculated distance to face is approx 0.77
         const d10Geo = createD10Geometry();
         const d10Faces = [];
         for(let i=0; i<5; i++) {
@@ -139,8 +139,8 @@ const getDieConfig = (type: DieType) => {
 
         return {
             geometry: d10Geo,
-            textOffset: 0.62,
-            fontSize: 0.4,
+            textOffset: 0.8, // Adjusted to sit just on the surface (0.77 -> 0.8)
+            fontSize: 0.3, // Smaller font to fit narrow faces
             faces: d10Faces
         };
     }
@@ -223,7 +223,6 @@ const FaceNumber = ({ position, normal, value, fontSize }: { position: THREE.Vec
                 anchorX="center"
                 anchorY="middle"
                 renderOrder={1} // Ensure text renders on top of the face
-                depthTest={false} // CRITICAL: Prevents text from being hidden by the die face
             >
                 {value}
             </Text>
