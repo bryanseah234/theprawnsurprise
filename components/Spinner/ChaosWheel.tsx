@@ -142,19 +142,19 @@ export const ChaosWheel: React.FC = () => {
                          key={item.id}
                          // Container acts as the "spoke" from center to edge.
                          // h-[50%] is radius length.
-                         // Flex centers the text block in the middle of this radius.
+                         // We rotate it by (angle + 180) because top:50% origin-top points to 6 o'clock (180deg).
+                         // Adding 180 aligns it with the calculated angle.
                          className="absolute top-1/2 left-1/2 h-[50%] w-8 -translate-x-1/2 origin-top flex justify-center pt-8 pb-4 pointer-events-none"
-                         style={{ transform: `rotate(${angle}deg)` }}
+                         style={{ transform: `rotate(${angle + 180}deg)` }}
                        >
                            {/* 
                              Use writing-mode: vertical-rl to handle text layout properly along the radius.
-                             This ensures length calculations (truncation) work on the vertical axis.
                            */}
                            <span 
                              className="block truncate text-center font-bold text-xs sm:text-sm max-h-[90%] w-full"
                              style={{ 
                                  writingMode: 'vertical-rl',
-                                 textOrientation: 'mixed', // Rotates latin characters 90deg CW
+                                 textOrientation: 'mixed',
                                  color: isLight ? 'black' : 'white',
                                  textShadow: isLight ? 'none' : '1px 1px 0px rgba(0,0,0,0.5)'
                             }}
