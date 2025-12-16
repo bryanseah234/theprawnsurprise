@@ -14,19 +14,16 @@ const App: React.FC = () => {
       
       {/* Header */}
       <header className="w-full bg-coral border-b-4 border-black p-6 shadow-retro z-10">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-center">
           <h1 className="font-retro text-2xl md:text-3xl text-white drop-shadow-[4px_4px_0px_#000]">
             PRAWN SURPRISE <span className="text-zest">?!</span>
           </h1>
-          <p className="font-sans text-xs md:text-sm font-bold text-black bg-white px-2 py-1 border-2 border-black shadow-retro-active">
-            v1.0.0 // RETRO CHAOS
-          </p>
         </div>
       </header>
 
       {/* Navigation Tabs */}
       <nav className="w-full max-w-4xl mx-auto mt-8 px-4">
-        <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-0">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-0">
           <TabButton 
             isActive={activeTab === Tab.DICE} 
             onClick={() => setActiveTab(Tab.DICE)}
