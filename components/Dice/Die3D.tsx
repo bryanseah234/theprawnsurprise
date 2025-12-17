@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Text, Float } from '@react-three/drei';
 import * as THREE from 'three';
@@ -60,18 +60,13 @@ const createD10Geometry = () => {
 const getDieConfig = (type: DieType) => {
   switch (type) {
     case DieType.D4: {
-        // Tetrahedron (Radius 1.5)
-        // Distance to face center = radius / 3 = 0.5
-        // Note: Standard Tetrahedron vertices are (1,1,1), (1,-1,-1), (-1,1,-1), (-1,-1,1).
-        // The Faces are OPPOSITE these vertices.
         const d4Geo = new THREE.TetrahedronGeometry(1.5);
         d4Geo.computeVertexNormals();
         return {
           geometry: d4Geo,
-          textOffset: 0.6, // Just above the surface (0.5)
+          textOffset: 0.6,
           fontSize: 0.35,
           faces: [
-            // Inverted vectors to point to faces, not vertices
             { value: 1, normal: new THREE.Vector3(-1, -1, -1).normalize() },
             { value: 2, normal: new THREE.Vector3(1, 1, -1).normalize() },
             { value: 3, normal: new THREE.Vector3(1, -1, 1).normalize() },
@@ -81,8 +76,6 @@ const getDieConfig = (type: DieType) => {
     }
 
     case DieType.D6: {
-        // Cube (Size 2)
-        // Distance to face center = 1.0
         return {
           geometry: new THREE.BoxGeometry(2, 2, 2),
           textOffset: 1.05, 
@@ -99,8 +92,6 @@ const getDieConfig = (type: DieType) => {
     }
 
     case DieType.D8: {
-        // Octahedron (Radius 1.5)
-        // Distance to face center ~ 0.866
         return {
           geometry: new THREE.OctahedronGeometry(1.5),
           textOffset: 0.88,
@@ -119,29 +110,20 @@ const getDieConfig = (type: DieType) => {
     }
 
     case DieType.D10: {
-        // Custom D10
-        // Radius=1, Height=1.2
-        // Face angle logic needs to align with the slope of the pyramid.
-        // Slope vector is (1.2, 1) relative to (r, y).
         const d10Geo = createD10Geometry();
         const d10Faces = [];
-        
-        // Slope factor for normal calculation
-        // For a cone with radius R and height H, normal has slope R/H in (r,y) space? 
-        // Normal vector N = (H, R)
         const slopeH = 1.2;
         const slopeR = 1.0;
 
         for(let i=0; i<5; i++) {
-             // Rotate by PI/5 to align with face centers (between vertices)
              const angle = (i / 5) * Math.PI * 2 + (Math.PI/5); 
              
-             // Top faces: Normal points UP and OUT
+             // Top faces
              d10Faces.push({
                  value: i * 2 + 1,
                  normal: new THREE.Vector3(Math.sin(angle) * slopeH, slopeR, Math.cos(angle) * slopeH).normalize()
              });
-             // Bottom faces: Normal points DOWN and OUT
+             // Bottom faces
              d10Faces.push({
                  value: i * 2 + 2,
                  normal: new THREE.Vector3(Math.sin(angle) * slopeH, -slopeR, Math.cos(angle) * slopeH).normalize()
@@ -150,7 +132,7 @@ const getDieConfig = (type: DieType) => {
 
         return {
             geometry: d10Geo,
-            textOffset: 0.95, // Increased offset to safely clear the geometry (Face distance ~0.77)
+            textOffset: 0.95, 
             fontSize: 0.35, 
             faces: d10Faces
         };
@@ -162,8 +144,16 @@ const getDieConfig = (type: DieType) => {
 
 const DieMesh = ({ type, result, isRolling }: { type: DieType, result: number | null, isRolling: boolean }) => {
   const meshRef = useRef<THREE.Mesh>(null);
-  const { geometry, faces, textOffset, fontSize } = useMemo(() => getDieConfig(type), [type]);
+  const config = useMemo(() => getDieConfig(type), [type]);
+  const { geometry, faces, textOffset, fontSize } = config;
   
+  // Dispose of geometry when it changes to prevent memory leaks/context loss
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+    };
+  }, [geometry]);
+
   const rotationSpeed = useRef(new THREE.Vector3(
      Math.random() * 0.2 + 0.1, 
      Math.random() * 0.2 + 0.1, 
@@ -203,7 +193,7 @@ const DieMesh = ({ type, result, isRolling }: { type: DieType, result: number | 
             {/* Coral material */}
             <MeshStandardMaterial color="#FF6F61" roughness={0.4} metalness={0.1} flatShading />
             
-            {/* Render Numbers on Faces - Black for contrast */}
+            {/* Render Numbers on Faces - Default Font */}
             {faces.map((face, i) => (
                 <FaceNumber 
                   key={i} 
@@ -230,10 +220,10 @@ const FaceNumber = ({ position, normal, value, fontSize }: { position: THREE.Vec
              <Text
                 color="black"
                 fontSize={fontSize}
-                font="https://fonts.gstatic.com/s/pressstart2p/v14/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff"
                 anchorX="center"
                 anchorY="middle"
-                renderOrder={1} // Ensure text renders on top of the face
+                fontWeight="bold" // Make standard font bolder to match retro feel
+                renderOrder={1} 
             >
                 {value}
             </Text>
