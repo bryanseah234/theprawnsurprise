@@ -16,7 +16,7 @@ const App: React.FC = () => {
       <header className="w-full bg-coral border-b-4 border-black p-6 shadow-retro z-10">
         <div className="max-w-4xl mx-auto flex items-center justify-center">
           <h1 className="font-retro text-2xl md:text-3xl text-white drop-shadow-[4px_4px_0px_#000]">
-            PRAWN SURPRISE <span className="text-zest">?!</span>
+            THE PRAWN SURPRISE <span className="text-zest">?!</span>
           </h1>
         </div>
       </header>
