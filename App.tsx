@@ -15,31 +15,31 @@ const App: React.FC = () => {
       {/* Header */}
       <header className="w-full bg-coral border-b-4 border-black p-6 shadow-retro z-10">
         <div className="max-w-4xl mx-auto flex items-center justify-center">
-          <h1 className="font-retro text-2xl md:text-3xl text-white drop-shadow-[4px_4px_0px_#000]">
+          <h1 className="font-retro text-xl sm:text-2xl md:text-3xl text-white drop-shadow-[4px_4px_0px_#000] text-center">
             THE PRAWN SURPRISE <span className="text-zest">?!</span>
           </h1>
         </div>
       </header>
 
       {/* Navigation Tabs */}
-      <nav className="w-full max-w-4xl mx-auto mt-8 px-4">
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-0">
+      <nav className="w-full max-w-4xl mx-auto mt-8 px-2">
+        <div className="flex flex-nowrap justify-center gap-1">
           <TabButton 
             isActive={activeTab === Tab.DICE} 
             onClick={() => setActiveTab(Tab.DICE)}
-            icon={<Dices className="w-4 h-4 mr-2" />}
+            icon={<Dices className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />}
             label="DICE ROLLER"
           />
           <TabButton 
             isActive={activeTab === Tab.SPINNER} 
             onClick={() => setActiveTab(Tab.SPINNER)}
-            icon={<Disc className="w-4 h-4 mr-2" />}
+            icon={<Disc className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />}
             label="CHAOS WHEEL"
           />
           <TabButton 
             isActive={activeTab === Tab.MAGIC_BALL} 
             onClick={() => setActiveTab(Tab.MAGIC_BALL)}
-            icon={<Sparkles className="w-4 h-4 mr-2" />}
+            icon={<Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />}
             label="MAGIC 8-BALL"
           />
         </div>
@@ -80,10 +80,7 @@ const TabButton: React.FC<TabButtonProps> = ({ isActive, onClick, icon, label })
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center px-4 py-3 font-retro text-xs border-2 border-black transition-all",
-        // Mobile spacing
-        "mb-2 sm:mb-0 mr-2 sm:mr-[-2px] last:mr-0",
-        // Active state
+        "flex items-center px-2 sm:px-4 py-2 sm:py-3 font-retro text-[8px] sm:text-xs border-2 border-black transition-all whitespace-nowrap",
         isActive 
           ? "bg-zest text-black shadow-none translate-y-1 z-10 relative" 
           : "bg-white text-gray-500 shadow-retro hover:bg-gray-100 hover:translate-y-[2px] hover:shadow-retro-active"
