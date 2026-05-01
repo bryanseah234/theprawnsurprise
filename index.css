@@ -1,6 +1,14 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-ocean: #0F4C81;
+  --color-coral: #FF6F61;
+  --color-zest: #F4D03F;
+  --font-family-retro: "Press Start 2P", cursive;
+  --font-family-sans: Inter, sans-serif;
+  --shadow-retro: 4px 4px 0px 0px rgba(0,0,0,1);
+  --shadow-retro-active: 2px 2px 0px 0px rgba(0,0,0,1);
+}
 
 body {
   margin: 0;
